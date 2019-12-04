@@ -1,3 +1,4 @@
+import java.time.Instant;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -79,7 +80,7 @@ public class Internal {
      */
     static void fillArr(){
         for(int i = 0; i<arr.length; i++){
-            arr[i] = r.nextInt(100);
+            arr[i] = r.nextInt();
             System.out.println("index "+i+" has been filled with "+arr[i]);
         }
 
@@ -95,8 +96,11 @@ public class Internal {
     public static void main(String[] args){
         int n = genArr();
         fillArr();
+        long start = System.nanoTime();
         sort(arr, n);
+        long finish = System.nanoTime();
+        long timeElapsed = finish - start;
         printArr();
-
+        System.out.println("Runtime in nanoseconds: "+timeElapsed);
     }
 }
