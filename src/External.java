@@ -26,6 +26,6 @@ public class External {
 
 
     public static void main(){
-
+        int[] arr = genInts();
     }
 }
