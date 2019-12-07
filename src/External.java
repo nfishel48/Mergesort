@@ -14,10 +14,43 @@ public class External {
     static Random r = new Random();
     static Scanner stdIn = new Scanner(System.in);
     static RandomAccessFile raf;
+    static RandomAccessFile rafTwo;
+
 
     /*
-    This method is where the merge sort algorithm is used
+    This method will take the appropriate amount of values from the file and place them into an array so it may be sorted
      */
+    static void run(int n, int mem) throws IOException {
+       int times;
+        if(mem>n)
+            times = 1;
+       else {
+           times = n / mem;
+        }
+        System.out.println("The file contains "+n+" values, only "+mem+" values can be sorted. The algorithm will be ran "+times+ " times.");
+       //Create array to load portions of the values into and sort them
+       while(times>0){
+           int[]run = new int[mem];
+           raf.seek(0);
+           //load ints into temporary array.
+           for(int i = 0; i<mem;i++){
+               int t = raf.readInt();
+               run[i] = t;
+           }
+           //sort the array
+           sort(run, mem);
+
+           //load the array back into a file
+           for(int j = 0; j<mem; j++){
+               rafTwo.writeInt(run[j]);
+           }
+           times--;
+       }
+    }
+
+    /*
+  This method is where the merge sort algorithm is used
+   */
     static void sort(int[] arr, int n){
         //if the array is size one return
         if(n<2)
@@ -73,18 +106,31 @@ public class External {
         int input = stdIn.nextInt();
         raf.seek(0);
         for(int i = 0; i<input; i++){
-           int t = r.nextInt();
+           int t = r.nextInt(10);
            raf.writeInt(t);
+           System.out.println("Placing "+t+"@ index " +i);
         }
         return input;
     }
 
-    static void printArr(){
+    /*
+    print the content of the file
+     */
+    static void printArr(int n) throws IOException {
         System.out.println();
-        System.out.println("The sorted array is:");
-        for(int i = 0; i<arr.length; i++){
-            System.out.println("index "+i+" "+arr[i]);
+        System.out.println("The sorted file is:");
+        rafTwo.seek(0);
+        for(int i = 0; i<n; i++){
+            int t = rafTwo.readInt();
+            System.out.println("index "+i+" is "+ t);
+
         }
+    }
+
+    static int ramSize(){
+        System.out.println("How many ints can fit in the 'RAM' for this experiment");
+        int memory = stdIn.nextInt();
+        return memory;
     }
 
     public static void main(String[] args) throws IOException {
@@ -93,12 +139,19 @@ public class External {
             } catch (FileNotFoundException e) {
             e.printStackTrace();
             }
+        try {
+            rafTwo = new RandomAccessFile("external2.dat", "rw");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         int n = genArr();
+        int mem = ramSize();
         long start = System.nanoTime();
-        sort(arr, n);
+        run(n,mem);
         long finish = System.nanoTime();
         long timeElapsed = finish - start;
-        printArr();
+        printArr(n);
+        raf.close();
         System.out.println("Runtime in nanoseconds: "+timeElapsed);
     }
 }
